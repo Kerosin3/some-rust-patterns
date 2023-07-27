@@ -55,7 +55,7 @@ impl State for Published {
         self // return Published
     }
     fn content<'a>(&self, _post: &'a Post) -> &'a str {
-        &_post.content
+        &_post.content // only here get text
     }
 }
 
