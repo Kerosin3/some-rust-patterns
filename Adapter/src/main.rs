@@ -1,10 +1,10 @@
 use std::rc::Rc;
 
 fn main() {
-    Client::func1(&DefaultTarget);
-    let t1 = Rc::new(Someusefullbehaviour::new(String::from("some new request")));
-    let adapter = Adapter::new(t1);
-    Client::func1(&adapter);
+    Client::execute_request(DefaultTarget);
+    let new_1 = Rc::new(NewTargetFunctionallity::new("hehehe".to_string()));
+    let adapter = Adapter::new(new_1);
+    Client::execute_request(adapter);
 }
 
 trait TargetAction {
@@ -17,38 +17,42 @@ struct DefaultTarget;
 
 impl TargetAction for DefaultTarget {}
 
-struct Someusefullbehaviour {
+struct NewTargetFunctionallity {
     data: String,
 }
-// pass this behaviour
-impl Someusefullbehaviour {
+
+impl NewTargetFunctionallity {
     fn new(s: String) -> Self {
         Self { data: s }
     }
-    fn specific_request(&self) -> String {
-        format!("some specific request {}", self.data)
+    fn specitic_request(&self) -> String {
+        format!("specific request {}", self.data)
+    }
+    fn backgrund_work(&self) {
+        println!("doing something in background");
     }
 }
 
 struct Adapter {
-    connector: Rc<Someusefullbehaviour>,
+    to_adapt: Rc<NewTargetFunctionallity>,
 }
+
 impl Adapter {
-    fn new(a: Rc<Someusefullbehaviour>) -> Self {
-        Self { connector: a }
+    fn new(a: Rc<NewTargetFunctionallity>) -> Self {
+        Self { to_adapt: a }
     }
 }
 
 impl TargetAction for Adapter {
     fn get_request(&self) -> String {
-        // new behaviour
-        format!("Adapter beh: {}", self.connector.specific_request())
+        self.to_adapt.backgrund_work();
+        self.to_adapt.specitic_request()
     }
 }
 
 struct Client;
 impl Client {
-    fn func1<T: TargetAction>(target: &T) {
-        println!("code runs: {}", target.get_request());
+    fn execute_request<T: TargetAction>(arg: T) {
+        println!("client executes: {}", arg.get_request());
     }
 }
